@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ArchangelAI · Cybernetic Core</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           ЧЕРНО-БЕЛАЯ ТЕМА · ARCHANGEL (исходный дизайн сохранён)
+           ========================================================================== */
+        :root {
+            --bg-color: #000000;
+            --surface-color: #0a0a0a;
+            --surface-hover: #1a1a1a;
+            --accent-primary: #ffffff;
+            --accent-secondary: #999999;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888888;
+            --border-light: rgba(255, 255, 255, 0.12);
+            --code-bg: #050505;
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: subtleScan 8s linear infinite;
+        }
+
+        @keyframes subtleScan {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        header {
+            padding: 16px 30px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            box-shadow: var(--shadow-soft);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            animation: scaleIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .logo {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo span {
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--surface-hover);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffffff;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--surface-hover);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-container input {
+            display: none;
+        }
+
+        .toggle-slider {
+            width: 36px;
+            height: 20px;
+            background: var(--text-secondary);
+            border-radius: 10px;
+            position: relative;
+            transition: var(--transition-smooth);
+        }
+
+        .toggle-slider::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: var(--transition-smooth);
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--accent-primary);
+        }
+
+        input:checked + .toggle-slider::after {
+            left: 18px;
+            background: var(--bg-color);
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scroll-behavior: smooth;
+            position: relative;
+            z-index: 5;
+        }
+
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-track { background: transparent; }
+        #chat-container::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+
+        .message {
+            max-width: 85%;
+            padding: 18px 22px;
+            border-radius: var(--radius-lg);
+            line-height: 1.65;
+            font-size: 1rem;
+            word-wrap: break-word;
+            animation: scaleIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: transparent;
+            color: var(--text-primary);
+            width: 100%;
+            max-width: 100%;
+            padding: 10px 0;
+            box-shadow: none;
+            border-radius: 0;
+            border-left: 3px solid var(--accent-primary);
+            padding-left: 20px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .msg-image {
+            max-width: 300px;
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            border: 1px solid var(--border-light);
+            display: block;
+        }
+
+        .file-info-tag {
+            background: var(--surface-hover);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            color: var(--accent-secondary);
+        }
+
+        pre {
+            background: var(--code-bg) !important;
+            padding: 0 !important;
+            border-radius: var(--radius-md);
+            margin: 20px 0;
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 2px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 0.75rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            padding: 16px !important;
+            display: block;
+            overflow-x: auto;
+        }
+
+        .thinking-block {
+            margin: 16px 0;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: var(--surface-color);
+        }
+
+        .thinking-block summary {
+            padding: 12px 16px;
+            background: var(--surface-hover);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition-smooth);
+        }
+
+        .thinking-block summary:hover {
+            background: #222;
+        }
+
+        .thinking-content {
+            padding: 16px;
+            white-space: pre-wrap;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--code-bg);
+            overflow-x: auto;
+        }
+
+        .input-container {
+            padding: 0 30px 30px 30px;
+            background: transparent;
+            z-index: 10;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .input-wrapper {
+            background: var(--surface-color);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-smooth);
+        }
+
+        #attachment-preview {
+            display: none;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+
+        .attachment-item {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--code-bg);
+        }
+        
+        .file-icon-preview { font-size: 20px; color: var(--text-secondary); }
+
+        .remove-attachment {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: none;
+            max-height: 150px;
+            min-height: 24px;
+            outline: none;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-hover);
+            color: white;
+        }
+
+        #send-btn {
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            border: none;
+            font-weight: 600;
+        }
+
+        input[type="file"] { display: none; }
+
+        .streaming-indicator {
+            display: inline-block;
+            font-weight: bold;
+            color: var(--accent-primary);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 12px 15px; }
+            #chat-container { padding: 15px; }
+            .message { max-width: 95%; }
+            .input-container { padding: 0 15px 15px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-icon">⌖</div>
+            <div class="logo">ArchangelAI <span>Cybernetic Core</span></div>
+        </div>
+        <div class="header-controls">
+            <label class="toggle-container" title="Режим глубокого размышления">
+                <span>Глубокое размышление</span>
+                <input type="checkbox" id="deep-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+            <div class="status-badge" id="model-status">
+                <div class="status-dot"></div>
+                <span id="current-model-text">System Active</span>
+            </div>
+        </div>
+    </header>
+
+    <div id="chat-container">
+        <div class="message ai-message">
+            <div class="ai-header">
+                <span style="color: var(--accent-primary);">⌖</span> ArchangelAI
+            </div>
+            <div>
+                ArchangelAI online. Готов к глубокому анализу.<br>
+                Отправьте запрос, код или изображение.
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-wrapper">
+            <div id="attachment-preview"></div>
+            <div class="input-controls">
+                <button class="btn-icon" id="attach-btn" title="Прикрепить файл">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                </button>
+                <input type="file" id="file-input" accept="image/*, .txt, .js, .py, .html, .css, .json, .md, .c, .cpp, .sh, .yaml, .yml, .xml, .csv">
+                
+                <textarea id="user-input" placeholder="Запрос или код... (Shift+Enter для новой строки)" rows="1"></textarea>
+                
+                <button class="btn-icon" id="send-btn" title="Отправить">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    (function() {
+        // ==================== КОНФИГУРАЦИЯ ====================
+        const CONFIG = {
+            API_KEY: "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",
+            API_URL: "https://api.groq.com/openai/v1/chat/completions",
+            MODELS: {
+                defaultText: "llama-3.3-70b-versatile",
+                defaultVision: "llama-3.2-90b-vision-preview",
+                fallbacks: [
+                    "llama-3.2-11b-vision-preview",
+                    "llama-3.3-70b-versatile"
+                ]
+            },
+            // Улучшенный промпт: акцент на контекст и гибкость
+            SYSTEM_PROMPT_DEFAULT: `Ты ArchangelAI – кибернетический аналитик и разработчик.
+Твоя главная задача – максимально точно понять запрос пользователя, учитывая ВЕСЬ предыдущий диалог.
+Прежде чем генерировать код, обязательно проанализируй контекст.
+- Если пользователь просит написать код (Kivy, Pygame, HTML5 и др.) — предоставь полный, безопасный, прокомментированный код.
+- Если запрос на анализ, консультацию или обсуждение — дай развёрнутый экспертный ответ без кода.
+- Если контекст подразумевает уточнение — сначала уточни.
+- При работе с файлами/изображениями детально анализируй их содержимое.
+НИКОГДА не пиши код, если он не затребован явно или не вытекает из контекста.
+Твой тон: профессиональный, прямой, без воды.`,
+            // Режим глубокого размышления с обязательным анализом контекста
+            SYSTEM_PROMPT_DEEP: `Ты ArchangelAI. Включён режим глубокого размышления.
+Выполни строгий протокол:
+1. Сначала внутри тега <context_analysis> кратко проанализируй ВЕСЬ диалог, уточни истинную цель пользователя, определи, требуется ли код.
+2. Внутри тега <archangel_prompt> создай расширенный, жёсткий промпт для самого себя. Учти результат анализа контекста, выбери оптимальный способ ответа (код, анализ, консультация). Если нужен код — пропиши структуру, технологии, безопасность.
+3. После </archangel_prompt> немедленно дай финальный ответ, строго следуя созданному промпту.
+Не добавляй ничего вне этих тегов. Начинай с <context_analysis>.`
+        };
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        class ArchangelApp {
+            constructor() {
+                this.chatContainer = document.getElementById('chat-container');
+                this.userInput = document.getElementById('user-input');
+                this.sendBtn = document.getElementById('send-btn');
+                this.attachBtn = document.getElementById('attach-btn');
+                this.fileInput = document.getElementById('file-input');
+                this.previewContainer = document.getElementById('attachment-preview');
+                this.deepToggle = document.getElementById('deep-toggle');
+                
+                // История сообщений для учёта контекста
+                this.messages = [];
+                this.currentAttachment = { type: null, data: null, name: null };
+                this.isProcessing = false;
+                this.deepMode = this.deepToggle.checked;
+
+                this.initListeners();
+            }
+
+            initListeners() {
+                this.sendBtn.addEventListener('click', () => this.handleSend());
+                this.userInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.handleSend();
+                    }
+                });
+                this.attachBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                this.deepToggle.addEventListener('change', () => {
+                    this.deepMode = this.deepToggle.checked;
+                });
+            }
+
+            getSystemPrompt() {
+                return this.deepMode ? CONFIG.SYSTEM_PROMPT_DEEP : CONFIG.SYSTEM_PROMPT_DEFAULT;
+            }
+
+            async handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const isImage = file.type.startsWith('image/');
+                this.currentAttachment.name = file.name;
+
+                if (isImage) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.currentAttachment.type = 'image';
+                        this.currentAttachment.data = e.target.result;
+                        this.showPreview(this.currentAttachment.data, true);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    const text = await file.text();
+                    this.currentAttachment.type = 'text';
+                    this.currentAttachment.data = text;
+                    this.showPreview(null, false);
+                }
+            }
+
+            showPreview(src, isImage) {
+                this.previewContainer.style.display = 'flex';
+                this.previewContainer.innerHTML = isImage 
+                    ? `<div class="attachment-item" style="background-image: url('${src}')"><button class="remove-attachment" onclick="window.archangelApp.clearAttachment()">×</button></div>`
+                    : `<div class="attachment-item"><div class="file-icon-preview">📄</div><div style="font-size:8px;position:absolute;bottom:2px;width:100%;text-align:center">${this.currentAttachment.name}</div><button class="remove-attachment" onclick="window.archangelApp.clearAttachment()">×</button></div>`;
+            }
+
+            clearAttachment() {
+                this.currentAttachment = { type: null, data: null, name: null };
+                this.previewContainer.style.display = 'none';
+                this.fileInput.value = '';
+            }
+
+            buildPayload(text, attachment) {
+                let promptText = text || "";
+                if (attachment.type === 'text') {
+                    promptText = `ФАЙЛ (${attachment.name}):\n\`\`\`\n${attachment.data}\n\`\`\`\n\nЗАПРОС: ${text || "Проанализируй этот файл."}`;
+                    return { role: "user", content: promptText };
+                } else if (attachment.type === 'image') {
+                    return {
+                        role: "user",
+                        content: [
+                            { type: "text", text: promptText || "Проанализируй это изображение." },
+                            { type: "image_url", image_url: { url: attachment.data } }
+                        ]
+                    };
+                }
+                return { role: "user", content: promptText };
+            }
+
+            async handleSend() {
+                const text = this.userInput.value.trim();
+                if ((!text && !this.currentAttachment.data) || this.isProcessing) return;
+
+                this.isProcessing = true;
+                this.appendUserMessage(text, this.currentAttachment);
+
+                const savedAttachment = { ...this.currentAttachment };
+                this.userInput.value = '';
+                this.clearAttachment();
+
+                const aiMsgBox = this.createAiMessageContainer();
+                const contentDiv = aiMsgBox.querySelector('.ai-content');
+                
+                await this.fetchBestModel(contentDiv, text, savedAttachment);
+                this.isProcessing = false;
+            }
+
+            async fetchBestModel(contentDiv, originalText, attachment) {
+                const systemPrompt = this.getSystemPrompt();
+                const userPayload = this.buildPayload(originalText, attachment);
+                const isVision = attachment.type === 'image';
+                
+                let primaryModel = isVision ? CONFIG.MODELS.defaultVision : CONFIG.MODELS.defaultText;
+                let allModels = [primaryModel, ...CONFIG.MODELS.fallbacks.filter(m => m !== primaryModel)];
+                
+                let fullResponseText = "";
+
+                for (let i = 0; i < allModels.length; i++) {
+                    const model = allModels[i];
+                    document.getElementById('current-model-text').innerText = `Model: ${model.split('-')[1] || '...'}`;
+
+                    try {
+                        const tempMessages = [
+                            { role: "system", content: systemPrompt },
+                            ...this.messages,
+                            userPayload
+                        ];
+
+                        const response = await fetch(CONFIG.API_URL, {
+                            method: "POST",
+                            headers: {
+                                "Authorization": `Bearer ${CONFIG.API_KEY}`,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                model: model,
+                                messages: tempMessages,
+                                temperature: 0.4,
+                                max_tokens: 8000,
+                                stream: true
+                            })
+                        });
+
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder("utf-8");
+                        fullResponseText = "";
+                        contentDiv.innerHTML = '<span class="streaming-indicator">▌</span>';
+
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split("\n");
+                            for (const line of lines) {
+                                if (line.startsWith("data: ") && line !== "data: [DONE]") {
+                                    try {
+                                        const json = JSON.parse(line.slice(6));
+                                        const delta = json.choices[0].delta.content;
+                                        if (delta) {
+                                            fullResponseText += delta;
+                                            contentDiv.innerHTML = marked.parse(fullResponseText) + '<span class="streaming-indicator">▌</span>';
+                                            this.scrollToBottom();
+                                        }
+                                    } catch (e) {}
+                                }
+                            }
+                        }
+
+                        const processedHtml = this.postProcessResponse(fullResponseText, this.deepMode);
+                        contentDiv.innerHTML = processedHtml;
+                        this.addCodeCopyButtons(contentDiv);
+
+                        this.messages.push(userPayload);
+                        this.messages.push({ role: "assistant", content: fullResponseText });
+
+                        document.getElementById('current-model-text').innerText = 'System Active';
+                        return;
+
+                    } catch (error) {
+                        console.warn(`Модель ${model} не сработала:`, error);
+                        if (i === allModels.length - 1) {
+                            contentDiv.innerHTML = `<span style="color:var(--accent-primary);">⚠️ Ошибка всех вычислительных узлов. Проверьте ключ API.</span>`;
+                        }
+                    }
+                }
+            }
+
+            postProcessResponse(rawText, deepMode) {
+                if (!deepMode) return marked.parse(rawText);
+
+                // Пытаемся извлечь блоки анализа контекста и промпта
+                const contextMatch = rawText.match(/<context_analysis>([\s\S]*?)<\/context_analysis>/i);
+                const promptMatch = rawText.match(/<archangel_prompt>([\s\S]*?)<\/archangel_prompt>/i);
+
+                let resultHtml = '';
+
+                if (contextMatch) {
+                    resultHtml += `
+                        <details class="thinking-block" open>
+                            <summary>🔍 Анализ контекста</summary>
+                            <div class="thinking-content">${this.escapeHtml(contextMatch[1].trim())}</div>
+                        </details>
+                    `;
+                }
+
+                if (promptMatch) {
+                    resultHtml += `
+                        <details class="thinking-block" open>
+                            <summary>🧠 Сгенерированный промпт для Archangel</summary>
+                            <div class="thinking-content">${this.escapeHtml(promptMatch[1].trim())}</div>
+                        </details>
+                    `;
+                }
+
+                // Всё, что после последнего закрывающего тега – финальный ответ
+                let finalAnswer = rawText;
+                if (promptMatch) {
+                    finalAnswer = rawText.substring(rawText.lastIndexOf('</archangel_prompt>') + '</archangel_prompt>'.length);
+                } else if (contextMatch) {
+                    finalAnswer = rawText.substring(rawText.lastIndexOf('</context_analysis>') + '</context_analysis>'.length);
+                }
+
+                resultHtml += marked.parse(finalAnswer.trim() || '<i>(пустой ответ)</i>');
+                return resultHtml || marked.parse(rawText);
+            }
+
+            escapeHtml(text) {
+                return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
+
+            appendUserMessage(text, attachment) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message user-message';
+                let html = '';
+                if (attachment.type === 'image') html += `<img src="${attachment.data}" class="msg-image">`;
+                if (attachment.type === 'text') html += `<div class="file-info-tag">📄 ${attachment.name}</div>`;
+                if (text) html += `<div>${text}</div>`;
+                msgDiv.innerHTML = html;
+                this.chatContainer.appendChild(msgDiv);
+                this.scrollToBottom();
+            }
+
+            createAiMessageContainer() {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message ai-message';
+                msgDiv.innerHTML = `<div class="ai-header"><span style="color:var(--accent-primary);">⌖</span> ArchangelAI</div><div class="ai-content"><span class="streaming-indicator">Анализирую...</span></div>`;
+                this.chatContainer.appendChild(msgDiv);
+                this.scrollToBottom();
+                return msgDiv;
+            }
+
+            addCodeCopyButtons(container) {
+                container.querySelectorAll('pre').forEach(pre => {
+                    if (pre.parentNode.querySelector('.code-header')) return;
+                    const wrapper = document.createElement('div');
+                    wrapper.style.position = 'relative';
+                    pre.parentNode.insertBefore(wrapper, pre);
+                    const codeEl = pre.querySelector('code');
+                    const lang = codeEl ? (codeEl.className.replace('language-', '') || 'code') : 'code';
+                    const header = document.createElement('div');
+                    header.className = 'code-header';
+                    header.innerHTML = `<span>${lang.toUpperCase()}</span><button class="copy-btn">Копировать</button>`;
+                    wrapper.appendChild(header);
+                    wrapper.appendChild(pre);
+                    header.querySelector('.copy-btn').addEventListener('click', (e) => {
+                        navigator.clipboard.writeText(pre.innerText);
+                        e.target.innerText = '✓';
+                        setTimeout(() => e.target.innerText = 'Копировать', 2000);
+                    });
+                });
+            }
+
+            scrollToBottom() {
+                this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+            }
+        }
+
+        window.archangelApp = new ArchangelApp();
+    })();
+</script>
+</body>
+</html>
